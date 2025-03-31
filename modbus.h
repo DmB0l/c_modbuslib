@@ -53,9 +53,9 @@ ModbusDevice* modbus_init_device(uint16_t num_holding, uint16_t num_input,
                                  uint16_t num_coils, uint16_t num_discrete);
 void modbus_free_device(ModbusDevice* device);
 int modbus_create_request(ModbusFrame* frame, uint8_t* buffer, uint16_t* length);
-int modbus_process_response(ModbusDevice* device, uint8_t* rx_buffer, uint16_t rx_length,
+int modbus_process_response_from_master(ModbusDevice* device, uint8_t* rx_buffer, uint16_t rx_length,
                             uint8_t* tx_buffer, uint16_t* tx_length);
-uint16_t* modbus_parse_response(uint8_t* buffer, uint16_t length, uint16_t* value_count);
+uint16_t* modbus_process_response_from_slave(uint8_t* buffer, uint16_t length, uint16_t* value_count);
 void print_hex(uint8_t* buffer, uint16_t length);
 
 #endif // MODBUS_H
