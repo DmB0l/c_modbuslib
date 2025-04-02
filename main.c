@@ -22,7 +22,7 @@ int main() {
     modbus_create_request(&fc05, request_buffer, &req_length);
     printf("FC05 Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC05 Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -39,7 +39,7 @@ int main() {
     modbus_create_request(&fc01, request_buffer, &req_length);
     printf("FC01 Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC01 Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -56,7 +56,7 @@ int main() {
     modbus_create_request(&fc02, request_buffer, &req_length);
     printf("FC02 Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC02 Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -73,7 +73,7 @@ int main() {
     modbus_create_request(&fc03, request_buffer, &req_length);
     printf("FC03 Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC03 Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -90,7 +90,7 @@ int main() {
     modbus_create_request(&fc04, request_buffer, &req_length);
     printf("FC04 Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC04 Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -107,7 +107,7 @@ int main() {
     modbus_create_request(&fc06, request_buffer, &req_length);
     printf("FC06 Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC06 Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -125,7 +125,7 @@ int main() {
     modbus_create_request(&fc0f, request_buffer, &req_length);
     printf("FC0F Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC0F Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -143,7 +143,7 @@ int main() {
     modbus_create_request(&fc10, request_buffer, &req_length);
     printf("FC10 Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC10 Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -160,7 +160,7 @@ int main() {
     modbus_create_request(&fc01_check, request_buffer, &req_length);
     printf("FC01 Check Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC01 Check Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
@@ -177,14 +177,14 @@ int main() {
     modbus_create_request(&fc03_check, request_buffer, &req_length);
     printf("FC03 Check Request: ");
     print_hex(request_buffer, req_length);
-    modbus_process_response_from_master(device, request_buffer, req_length, response_buffer, &resp_length);
+    modbus_process_response(device, request_buffer, req_length, response_buffer, &resp_length);
     printf("FC03 Check Response: ");
     print_hex(response_buffer, resp_length);
     printf("\n");
 
 
     uint16_t value_count;
-    uint16_t* values = modbus_process_response_from_slave(response_buffer, resp_length, &value_count);
+    uint16_t* values = modbus_parse_response(response_buffer, resp_length, &value_count);
 
     if (values != NULL) {
         printf("Returned values: ");

@@ -111,7 +111,7 @@ int modbus_create_request(ModbusFrame* frame, uint8_t* buffer, uint16_t* length)
 }
 
 // Обработка запроса от master
-int modbus_process_response_from_master(ModbusDevice* device, uint8_t* rx_buffer, uint16_t rx_length,
+int modbus_process_response(ModbusDevice* device, uint8_t* rx_buffer, uint16_t rx_length,
                             uint8_t* tx_buffer, uint16_t* tx_length) {
     if (rx_length < MODBUS_MIN_ADU_SIZE) return MODBUS_ERR_VALUE;
 
@@ -247,17 +247,24 @@ void print_hex(uint8_t* buffer, uint16_t length) {
 }
 
 // Обработка ответа от slave устройства
-uint16_t *modbus_process_response_from_slave(uint8_t *buffer, uint16_t length, uint16_t *value_count) {
+uint16_t *modbus_parse_response(uint8_t *buffer, uint16_t length, uint16_t *value_count) {
     if (length < MODBUS_MIN_ADU_SIZE) {
+        printf("Error: Response too short\n");
         *value_count = 0;
         return NULL;
     }
 
-    // uint8_t slave_id = buffer[0];
+    uint8_t slave_id = buffer[0];
     uint8_t function = buffer[1];
-    // uint16_t crc = (buffer[length-1] << 8) | buffer[length-2];
+    uint16_t crc = (buffer[length-1] << 8) | buffer[length-2];
+
+    printf("Parsed Response:\n");
+    printf("  Slave ID: %d\n", slave_id);
+    printf("  Function Code: 0x%02X\n", function);
 
     if (function >= 0x80) {
+        printf("  Error Code: 0x%02X\n", buffer[2]);
+        printf("  CRC: 0x%04X\n", crc);
         *value_count = 0;
         return NULL;
     }
@@ -270,6 +277,8 @@ uint16_t *modbus_process_response_from_slave(uint8_t *buffer, uint16_t length, u
     case FC_READ_DISCRETE_INPUTS: {
         uint8_t byte_count = buffer[2];
         uint16_t bit_count = byte_count * 8; // Максимальное число бит
+        printf("  Byte Count: %d\n", byte_count);
+        printf("  Values: ");
 
         // Выделяем память под значения (по одному биту на значение)
         result = (uint16_t*)malloc(bit_count * sizeof(uint16_t));
@@ -280,15 +289,20 @@ uint16_t *modbus_process_response_from_slave(uint8_t *buffer, uint16_t length, u
             for (int bit = 0; bit < 8 && (i * 8 + bit) < bit_count; bit++) {
                 uint16_t value = (byte >> bit) & 1;
                 result[*value_count] = value;
+                printf("%d", value);
+                if (i * 8 + bit + 1 < bit_count) printf(" ");
                 (*value_count)++;
             }
         }
+        printf("\n");
         break;
     }
     case FC_READ_HOLDING_REG:
     case FC_READ_INPUT_REG: {
         uint8_t byte_count = buffer[2];
         uint16_t reg_count = byte_count / 2;
+        printf("  Byte Count: %d\n", byte_count);
+        printf("  Register Values: ");
 
         // Выделяем память под значения регистров
         result = (uint16_t*)malloc(reg_count * sizeof(uint16_t));
@@ -297,13 +311,23 @@ uint16_t *modbus_process_response_from_slave(uint8_t *buffer, uint16_t length, u
         for (uint16_t i = 0; i < reg_count; i++) {
             uint16_t value = (buffer[3 + i*2] << 8) | buffer[4 + i*2];
             result[i] = value;
+            printf("%d", value);
+            if (i + 1 < reg_count) printf(", ");
         }
+        printf("\n");
         break;
     }
     case FC_WRITE_SINGLE_COIL:
     case FC_WRITE_SINGLE_REG: {
-        // uint16_t address = (buffer[2] << 8) | buffer[3];
-        // uint16_t value = (buffer[4] << 8) | buffer[5];
+        uint16_t address = (buffer[2] << 8) | buffer[3];
+        uint16_t value = (buffer[4] << 8) | buffer[5];
+        printf("  Address: %d\n", address);
+        printf("  Value: ");
+        if (function == FC_WRITE_SINGLE_COIL) {
+            printf("%s\n", value == 0xFF00 ? "ON" : "OFF");
+        } else {
+            printf("%d\n", value);
+        }
         // Ничего не возвращаем
         *value_count = 0;
         result = NULL;
@@ -311,18 +335,22 @@ uint16_t *modbus_process_response_from_slave(uint8_t *buffer, uint16_t length, u
     }
     case FC_WRITE_MULT_COILS:
     case FC_WRITE_MULT_REG: {
-        // uint16_t address = (buffer[2] << 8) | buffer[3];
-        // uint16_t quantity = (buffer[4] << 8) | buffer[5];
+        uint16_t address = (buffer[2] << 8) | buffer[3];
+        uint16_t quantity = (buffer[4] << 8) | buffer[5];
+        printf("  Address: %d\n", address);
+        printf("  Quantity: %d\n", quantity);
         // Ничего не возвращаем
         *value_count = 0;
         result = NULL;
         break;
     }
     default:
+        printf("  Unknown function code\n");
         *value_count = 0;
         result = NULL;
         break;
     }
+    printf("  CRC: 0x%04X\n", crc);
 
     return result;
 }
