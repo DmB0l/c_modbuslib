@@ -111,7 +111,7 @@ int modbus_create_request(ModbusFrame* frame, uint8_t* buffer, uint16_t* length)
 }
 
 // Обработка запроса от master
-int modbus_process_response(ModbusDevice* device, uint8_t* rx_buffer, uint16_t rx_length,
+int modbus_process_response_from_master(ModbusDevice* device, uint8_t* rx_buffer, uint16_t rx_length,
                             uint8_t* tx_buffer, uint16_t* tx_length) {
     if (rx_length < MODBUS_MIN_ADU_SIZE) return MODBUS_ERR_VALUE;
 
@@ -247,7 +247,7 @@ void print_hex(uint8_t* buffer, uint16_t length) {
 }
 
 // Обработка ответа от slave устройства
-uint16_t *modbus_parse_response(uint8_t *buffer, uint16_t length, uint16_t *value_count) {
+uint16_t *modbus_process_response_from_slave(uint8_t *buffer, uint16_t length, uint16_t *value_count) {
     if (length < MODBUS_MIN_ADU_SIZE) {
         printf("Error: Response too short\n");
         *value_count = 0;
