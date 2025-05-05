@@ -38,10 +38,10 @@ typedef struct {
 
 // Структура для хранения регистров устройства
 typedef struct {
-    uint16_t* holding_registers;
-    uint16_t* input_registers;
-    bool* coils;
-    bool* discrete_inputs;
+    uint16_t* holding_registers; //read/write
+    uint16_t* input_registers; //read
+    bool* coils; //read/write
+    bool* discrete_inputs; //read
     uint16_t num_holding_regs;
     uint16_t num_input_regs;
     uint16_t num_coils;
