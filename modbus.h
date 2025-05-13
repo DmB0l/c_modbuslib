@@ -4,6 +4,21 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Макрос для экспорта/импорта
+#ifdef _WIN32
+#    ifdef CMODBUSLIB_EXPORTS
+#        define CMODBUSLIB_API __declspec(dllexport)
+#    else
+#        define CMODBUSLIB_API __declspec(dllimport)
+#    endif
+#else
+#    define CMODBUSLIB_API
+#endif
+
 // Определение констант Modbus
 #define MODBUS_MAX_ADU_SIZE     256
 #define MODBUS_MIN_ADU_SIZE     4
@@ -49,13 +64,17 @@ typedef struct {
 } ModbusDevice;
 
 // Прототипы функций
-ModbusDevice* modbus_init_device(uint16_t num_holding, uint16_t num_input,
+CMODBUSLIB_API ModbusDevice* modbus_init_device(uint16_t num_holding, uint16_t num_input,
                                  uint16_t num_coils, uint16_t num_discrete);
-void modbus_free_device(ModbusDevice* device);
-int modbus_create_request(ModbusFrame* frame, uint8_t* buffer, uint16_t* length);
-int modbus_process_response_from_master(ModbusDevice* device, uint8_t* rx_buffer, uint16_t rx_length,
+CMODBUSLIB_API void modbus_free_device(ModbusDevice* device);
+CMODBUSLIB_API int modbus_create_request(ModbusFrame* frame, uint8_t* buffer, uint16_t* length);
+CMODBUSLIB_API int modbus_process_response_from_master(ModbusDevice* device, uint8_t* rx_buffer, uint16_t rx_length,
                             uint8_t* tx_buffer, uint16_t* tx_length);
-uint16_t* modbus_process_response_from_slave(uint8_t* buffer, uint16_t length, uint16_t* value_count);
-void print_hex(uint8_t* buffer, uint16_t length);
+CMODBUSLIB_API uint16_t* modbus_process_response_from_slave(uint8_t* buffer, uint16_t length, uint16_t* value_count);
+CMODBUSLIB_API void print_hex(uint8_t* buffer, uint16_t length);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MODBUS_H
