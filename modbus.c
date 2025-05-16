@@ -290,7 +290,7 @@ uint16_t *modbus_process_response_from_slave(uint8_t *buffer, uint16_t length, u
                 uint16_t value = (byte >> bit) & 1;
                 result[*value_count] = value;
                 //printf("%d", value);
-                if (i * 8 + bit + 1 < bit_count) //printf(" ");
+                //if (i * 8 + bit + 1 < bit_count) printf(" ");
                 (*value_count)++;
             }
         }
@@ -312,7 +312,7 @@ uint16_t *modbus_process_response_from_slave(uint8_t *buffer, uint16_t length, u
             uint16_t value = (buffer[3 + i*2] << 8) | buffer[4 + i*2];
             result[i] = value;
             //printf("%d", value);
-            //if (i + 1 < reg_count) //printf(", ");
+            //if (i + 1 < reg_count) printf(", ");
         }
         //printf("\n");
         break;
